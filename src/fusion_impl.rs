@@ -296,4 +296,8 @@ impl Fusion {
     pub fn quaternion(&self) -> FusionQuaternion {
         self.ahrs.quaternion
     }
+
+    pub fn set_heading(&mut self, heading: f32) {
+        self.ahrs.set_heading(heading);
+    }
 }

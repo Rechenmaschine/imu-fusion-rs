@@ -185,7 +185,7 @@ impl FusionAhrs {
         }
     }
 
-    fn set_heading(&mut self, heading: f32) {
+    pub fn set_heading(&mut self, heading: f32) {
         let q = self.quaternion;
         let yaw = atan2f(q.w * q.z + q.x * q.y, 0.5f32 - q.y * q.y - q.z * q.z);
         let half_yaw_minus_heading = 0.5f32 * (yaw - fusion_degrees_to_radians(heading));
@@ -195,7 +195,7 @@ impl FusionAhrs {
             y: 0.0f32,
             z: -1.0f32 * sinf(half_yaw_minus_heading),
         };
-        self.quaternion = self.quaternion * rotation;
+        self.quaternion = rotation * self.quaternion;
     }
 
     pub fn reset(&mut self) {
