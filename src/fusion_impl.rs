@@ -247,6 +247,44 @@ impl Fusion {
         self.ahrs.update(gyr, acc, mag, delta_t);
     }
 
+    /// Sets the current heading/yaw of the AHRS solution.
+    ///
+    /// Calling this method rotates the internally stored orientation precisely around the vertical axis,
+    /// aligning yaw exactly to the provided `heading`. Roll and pitch are preserved within
+    /// numerical precision.
+    ///
+    /// Use it when you have an external, absolute heading reference, and want to align
+    /// the filter’s frame with that reference.
+    ///
+    /// This operation does not reset the filter, change the gyroscope-bias estimator, or touch
+    /// any timing state; you can invoke it between successive `update_*` calls without disrupting 
+    /// the ongoing fusion process.
+    ///
+    /// # Arguments
+    /// * `heading` – Desired heading in **degrees**.
+    ///
+    /// # Examples
+    /// ```
+    /// # // shortest-arc difference with eps = 0.001°
+    /// # let angle_approx_eq = |a: f32, b: f32| ((a - b + 180.0).rem_euclid(360.0) - 180.0).abs() < 0.001;
+    /// use imu_fusion::{Fusion, FusionVector, FusionAhrsSettings};
+    ///
+    /// const SAMPLE_RATE_HZ: u32 = 100;
+    ///
+    /// let mut fusion = Fusion::new(SAMPLE_RATE_HZ, FusionAhrsSettings::new());
+    ///
+    /// // ... update sensor values
+    ///
+    /// let true_heading_deg = 90.0;
+    /// fusion.set_heading(true_heading_deg);
+    ///
+    /// // yaw is now aligned with the true heading
+    /// assert!(angle_approx_eq(fusion.euler().get_yaw(), true_heading_deg));
+    /// ```
+    pub fn set_heading(&mut self, heading: f32) {
+        self.ahrs.set_heading(heading);
+    }
+
     /// Obtain euler angle current sensor position
     ///
     /// Euler angles are provided in degrees
